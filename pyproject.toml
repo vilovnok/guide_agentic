@@ -1,0 +1,7 @@
+[project]
+name = "guide-agentic"
+version = "0.1.0"
+description = "Add your description here"
+readme = "readme.md"
+requires-python = ">=3.11"
+dependencies = []
