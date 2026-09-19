@@ -1,0 +1,8 @@
+trash/*
+*/__pycache__/*
+default_workspace/config.user.yaml
+
+.venv/
+venv/
+
+*.ipynb
