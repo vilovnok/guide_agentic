@@ -1,0 +1,71 @@
+import asyncio
+
+import typer
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich.text import Text
+
+from chat_loop.core.agent import Agent
+from chat_loop.core.agent_loader import AgentLoader
+from chat_loop.utils.config import Config
+
+
+class ChatLoop:
+    def __init__(self, config: Config, agent_id: str | None = None):
+        self.config = config
+        self.console = Console()
+
+        loader = AgentLoader(config)
+        agent_id = agent_id or config.default_agent
+        self.agent_def = loader.load(agent_id)
+
+        self.agent = Agent(self.agent_def, config)
+        self.session = self.agent.new_session()
+
+    def get_user_input(self) -> str:
+        prompt_text = Text("You", style="cyan")
+        user_input = Prompt.ask(prompt_text, console=self.console)
+        return user_input.strip()
+
+    def display_agent_response(self, content: str) -> None:
+        prefix = Text(f"{self.agent_def.id}: ", style="green")
+
+        self.console.print(prefix, end="")
+        self.console.print(content)
+
+    async def run(self) -> None:
+        """Run the interactive chat loop."""
+        self.console.print(
+            Panel(
+                Text("Welcome to my-bot!", style="bold cyan"),
+                title="Chat",
+                border_style="cyan",
+            )
+        )
+        self.console.print("Type 'quit' or 'exit' to end the session.\n")
+
+        try:
+            while True:
+                user_input = await asyncio.to_thread(self.get_user_input)
+
+                if user_input.lower() in ("quit", "exit", "q"):
+                    self.console.print("\n[bold yellow]Goodbye![/bold yellow]")
+                    break
+
+                if not user_input:
+                    continue
+
+                try:
+                    response = await self.session.chat(user_input)
+                    self.display_agent_response(response)
+                except Exception as e:
+                    self.console.print(f"\n[bold red]Error:[/bold red] {e}\n")
+
+        except (KeyboardInterrupt, EOFError):
+            self.console.print("\n[bold yellow]Goodbye![/bold yellow]")
+
+
+def chat_command(config: Config, agent_id: str | None = None) -> None:
+    chat_loop = ChatLoop(config, agent_id=agent_id)
+    asyncio.run(chat_loop.run())
