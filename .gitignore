@@ -6,3 +6,7 @@ default_workspace/config.user.yaml
 venv/
 
 *.ipynb
+
+
+__pycache__/
+*.pyc
