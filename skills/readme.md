@@ -1,4 +1,4 @@
-# Tools
+# Skills
 
 ### Скопируйте конфиг и добавьте ключ API:
 ```bash
@@ -8,5 +8,5 @@ cp default_workspace/config.example.yaml default_workspace/config.user.yaml
 
 ### Запуск
 ```bash
-uv run tool
+uv run skills
 ```
